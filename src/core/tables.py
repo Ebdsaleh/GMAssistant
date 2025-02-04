@@ -1,4 +1,5 @@
 # src/core/tables.py
+
 """
 This file will hold all the core meaning tables from the Mythic Game Master Emulator
 """

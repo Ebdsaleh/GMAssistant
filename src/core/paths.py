@@ -1,4 +1,5 @@
 # src/core/paths.py
+
 """
 This file is to store program-wide paths.
 """

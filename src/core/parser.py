@@ -1,4 +1,5 @@
 # src.core.parser.py
+
 """
 This class uses the Lexer class to interpret the input from the user and execute the GM commands.
 """
