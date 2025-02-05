@@ -97,4 +97,45 @@ class TitleScreen(Scene):
         super().__init__(scene_dpg, "title_screen")
         self.dpg = scene_dpg
         self.name = "title_screen"
+        self.window = None
+        self.dynamic_window = None
+        self.button_box = None
+        self.create()
+        self.hide()
+
+    def create(self):
+        self.window = self.dpg.add_window(label="Title Screen", pos=(0, 0), width=actual_width, height=actual_height,
+                                          no_title_bar=True, no_move=True)
+        text_id = self.dpg.add_text("Welcome to the Game Master Assistant", parent=self.window,
+                                    pos=(actual_width / 2, 10))
+        self.button_box = ButtonBox(self.dpg)
+        self.dynamic_window = DynamicViewPort(self.dpg)
+        self.add_component("test_window", self.window)
+        self.add_component("text", text_id)
+        self.add_component("button_box", self.button_box)
+        self.add_component("dynamic_window", self.dynamic_window)
+        self.get_component_by_name("button_box").set_create_button_callback(self.on_create_clicked)
+        self.get_component_by_name("button_box").set_load_button_callback(self.on_load_clicked)
+        self.get_component_by_name("button_box").set_join_button_callback(self.on_join_clicked)
+        self.get_component_by_name("button_box").set_options_button_callback(self.on_options_clicked)
+        self.get_component_by_name("button_box").set_exit_button_callback(self.on_exit_clicked)
+
+    def on_create_clicked(self):
+        self.dynamic_window.clear_section_text()
+        self.dynamic_window.set_section_text("Create Session:")
+
+    def on_load_clicked(self):
+        self.dynamic_window.clear_section_text()
+        self.dynamic_window.set_section_text("Load Session:")
+
+    def on_join_clicked(self):
+        self.dynamic_window.clear_section_text()
+        self.dynamic_window.set_section_text("Join Session:")
+
+    def on_options_clicked(self):
+        self.dynamic_window.clear_section_text()
+        self.dynamic_window.set_section_text("Options:")
+
+    def on_exit_clicked(self):
+        quit(0)
 

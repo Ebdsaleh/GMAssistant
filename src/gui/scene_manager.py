@@ -12,7 +12,7 @@ class SceneManager:
     def __init__(self, app_window):
         self.app_window = app_window
         self.scene_list = []
-        self.populate_scenes_list()
+        self.populate_scene_list()
         self.current_scene = None
 
     def populate_scene_list(self):
