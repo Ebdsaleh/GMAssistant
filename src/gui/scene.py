@@ -48,16 +48,19 @@ class Scene:
         for key, value in self.components.items():
             if isinstance(value, Scene):
                 value.show()
-            self.dpg.configure_item(value, show=True)
+            else:
+                self.dpg.configure_item(value, show=True)
 
     def hide(self):
         for key, value in self.components.items():
             if isinstance(value, Scene):
                 value.hide()
-            self.dpg.configure_item(value, show=False)
+            else:
+                self.dpg.configure_item(value, show=False)
 
     def clear(self):
         for key, value in self.components.items():
             if isinstance(value, Scene):
                 value.clear()
-            self.dpg.configure_item(value, show=False)
+            else:
+                self.dpg.configure_item(value, show=False)
