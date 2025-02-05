@@ -26,7 +26,7 @@ class SceneManager:
             if scene_name == scene.name:
                 try:
                     self.current_scene = scene
-                    print(f"Scene created: {self.current_scene}")
+                    print(f"Scene created: {self.current_scene.name}")
                     self.current_scene.show()
                 except Exception as e:
                     print(f"Error while creating scene: {e}")

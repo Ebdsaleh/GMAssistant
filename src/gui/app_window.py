@@ -8,6 +8,7 @@ for other classes to access items inside the application's presentation.
 import dearpygui.dearpygui as dpg
 from src.core.utils import actual_width, actual_height
 from src.gui.scene_manager import SceneManager
+from src.gui.theme_manager import ThemeManager
 
 class AppWindow:
     _instance = None
@@ -29,15 +30,16 @@ class AppWindow:
         self.dpg.create_context()
         self.dpg.set_global_font_scale(1.25)
         self.dpg.create_viewport(title="Game Master Assistant", width=actual_width, height=actual_height)
-        # self.theme_manager = ThemeManager()
+        self.theme_manager = ThemeManager()
         self.scene_manager = SceneManager(self)
         self.scene_manager.load_scene("title_screen")
         self.dpg.setup_dearpygui()
         self.dpg.show_viewport()
         self.dpg.start_dearpygui()
 
-        def close(self):
-            self._instance.dpg.destroy_context()
+    def close(self):
+        self._instance.dpg.destroy_context()
+        quit(0)
 
 
 app_handle = AppWindow()

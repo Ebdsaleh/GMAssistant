@@ -137,5 +137,5 @@ class TitleScreen(Scene):
         self.dynamic_window.set_section_text("Options:")
 
     def on_exit_clicked(self):
+        self.clear()
         quit(0)
-
