@@ -10,6 +10,11 @@ import os
 from src.core.paths import root_dir, sessions_dir
 list_states = ["initial", "D4", "D6", "D8", "D10"]
 
+standard_width = 1920
+standard_height = 1080
+actual_width = 1920
+actual_height = 1080
+
 
 class Message:
     _instance = None
