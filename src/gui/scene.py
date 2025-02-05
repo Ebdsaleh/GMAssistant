@@ -5,11 +5,11 @@ This class is responsible for creating Scenes to be loaded by the SceneManager c
 application window.
 """
 
-import dearpygui.dearpygui as dpg
+import dearpygui.dearpygui as scene_dpg
 
 
 class Scene:
-    def __init__(self, dpg, name="New Scene"):
+    def __init__(self, dpg=scene_dpg, name="New Scene"):
         self.dpg = dpg
         self.name = name
         self.components = {}
@@ -46,12 +46,18 @@ class Scene:
 
     def show(self):
         for key, value in self.components.items():
+            if isinstance(value, Scene):
+                value.show()
             self.dpg.configure_item(value, show=True)
 
     def hide(self):
         for key, value in self.components.items():
+            if isinstance(value, Scene):
+                value.hide()
             self.dpg.configure_item(value, show=False)
 
     def clear(self):
         for key, value in self.components.items():
+            if isinstance(value, Scene):
+                value.clear()
             self.dpg.configure_item(value, show=False)
