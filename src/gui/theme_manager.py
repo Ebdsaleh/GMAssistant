@@ -12,7 +12,25 @@ import os
 class ThemeManager:
     def __init__(self):
         self.themes = {}  # Stores themes by name
-        self.load_default_themes()
+        # Ensure the themes directory exists
+        if not os.path.exists(theme_dir):
+            os.mkdir(theme_dir)
+            self.load_default_themes()
+        self.load_themes()
+
+    def load_themes(self):
+
+        """Load all themes from the themes directory"""
+        for file in os.listdir(theme_dir):
+            if file.endswith(".json"):
+                theme_name = file.replace(".json", "")
+                theme_path = os.path.join(theme_dir, file)
+                self.themes[theme_name] = Theme.load(theme_path, theme_name)
+
+    def save_theme(self, theme):
+        """Save a theme to the themes directory"""
+        theme_path = os.path.join(theme_dir, f"{theme.name}.json")
+        theme.save(theme_path)
 
     def load_default_themes(self):
         """Load predefined themes (Light and Dark)."""
@@ -24,6 +42,8 @@ class ThemeManager:
         light_theme.set_property(dpg.mvAll, dpg.mvThemeCol_WindowBg, [240, 240, 240])
         light_theme.set_property(dpg.mvAll, dpg.mvThemeCol_Text, [0, 0, 0])
 
+        self.save_theme(dark_theme)
+        self.save_theme(light_theme)
         self.themes["Dark Theme"] = dark_theme
         self.themes["Light Theme"] = light_theme
 
@@ -41,19 +61,3 @@ class ThemeManager:
         else:
             print(f"Theme '{theme_name}' not found.")
 
-    def save_theme(self, theme_name, file_path):
-        """Save a theme to a JSON file."""
-        if theme_name in self.themes:
-            self.themes[theme_name].save(file_path)
-        else:
-            print(f"Theme '{theme_name}' not found.")
-
-    def load_theme(self, file_path):
-        """Load a theme from a JSON file."""
-        if os.path.exists(file_path):
-            theme = Theme.load(file_path)
-            self.add_theme(theme)
-            return theme
-        else:
-            print(f"File '{file_path}' not found.")
-            return None
