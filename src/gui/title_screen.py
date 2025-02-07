@@ -17,7 +17,7 @@ class CreateSessionView(Scene):
 
     def create(self):
         self.dpg.add_text("Create Session:", parent=self.parent.view_container, pos=(10, 10))
-        text_enter_session_name_id = self.dpg.add_text(
+        self.dpg.add_text(
             "Enter the session name:", pos=(10, 50),
             parent=self.parent.view_container, show=True
         )
@@ -35,7 +35,43 @@ class CreateSessionView(Scene):
                    "Savage Worlds Adventure Edition (SWADE)",
                    "Starfinder"],
             parent=self.parent.view_container, pos=(10, 130), show=True)
-        self.parent.active_view = self
+
+
+class LoadSessionView(Scene):
+    def __init__(self,dpg=scene_dpg, parent=None):
+        super().__init__(dpg, name="load_session_view")
+        self.dpg = dpg
+        self.parent = parent
+        self.create()
+
+    def create(self):
+        self.dpg.add_text("Load Session:", parent=self.parent.view_container, pos=(10, 10))
+        self.dpg.add_text("Available Sessions:", parent=self.parent.view_container, pos=(10, 50))
+        self.dpg.add_button(label="Confirm", pos=(450, 50), parent=self.parent.view_container)
+        self.dpg.add_listbox(
+            items=["session 1", "session 2", "session 3"], parent=self.parent.view_container, pos=(10, 100))
+
+class JoinSessionView(Scene):
+    def __init__(self, dpg=scene_dpg, parent=None):
+        super().__init__(dpg, name="join_session_view")
+        self.dpg = dpg
+        self.parent = parent
+        self.create()
+
+    def create(self):
+        self.dpg.add_text("Join Session:", parent=self.parent.view_container)
+
+
+class OptionsView(Scene):
+    def __init__(self, dpg=scene_dpg, parent=None):
+        super().__init__(dpg, name="options_view")
+        self.dpg = dpg
+        self.parent = parent
+        self.create()
+
+    def create(self):
+        self.dpg.add_text("Options:", parent=self.parent.view_container)
+
 
 class DynamicViewPort(Scene):
     print("Initializing DynamicView...")
@@ -45,36 +81,34 @@ class DynamicViewPort(Scene):
         self.name = "dynamic_view"
         self.view_container = None
         self.section_text_id = None
-        self.active_view = None
+        self.current_view = None
         self.create()
 
     def create(self):
         self.view_container = self.dpg.add_window(
             label="dynamic_view", width=800, height=600,
             pos=(actual_width / 2 - 350, actual_height / 5), no_title_bar=True, no_move=True)
-        self.section_text_id = self.dpg.add_text(label="Content will display here dynamically.",
-                                                 parent=self.view_container)
         self.add_component("view_container", self.view_container)
-        self.add_component("section_text", self.section_text_id)
 
-    def clear_section_text(self):
-        if self.section_text_id:
-            self.dpg.set_value(self.section_text_id, "")
+    def clear_view(self):
+        """Clear all widgets from the view container."""
+        if self.view_container:
+            try:
+                self.dpg.delete_item(self.view_container, children_only=True)
+            except Exception as e:
+                print(f"Error clearing view: {e}")
 
-    def set_section_text(self, new_text):
-        print(f"set_section_text: {new_text}")
-        if self.section_text_id:
-            self.dpg.set_value(self.section_text_id, new_text)
-
-    def create_session_view(self):
-        self.clear_section_text()
-        self.set_section_text("Create Session:")
-
+    def set_view(self, view):
+        """Set a new view in the dynamic viewport."""
+        self.clear_view()
+        self.current_view = view
+        view.create()  # Create the
 
 class ButtonBox(Scene):
     print("Initializing ButtonBox...")
-    def __init__(self, dpg=scene_dpg):
+    def __init__(self, dpg=scene_dpg, dynamic_viewport=None):
         super().__init__(dpg, name="button_box")
+        self.dynamic_viewport  = dynamic_viewport
         self.dpg = dpg
         self.name = "button_box"
         self.container = None
@@ -84,45 +118,39 @@ class ButtonBox(Scene):
         self.container = self.dpg.add_window(
             label="menu_buttons", pos=(300, 300), width=300, height=400, no_background=True, no_title_bar=True,
             no_move=True)
-        text_id = self.dpg.add_text("Menu Buttons", parent=self.container)
-        btn_create_session = self.dpg.add_button(
-            label="Create Session", parent=self.container, width=250, height=50)
-        btn_load_session = self.dpg.add_button(
-            label="Load Session", parent=self.container, width=250, height=50)
-        btn_join_session = self.dpg.add_button(
-            label="Join Session", parent=self.container, width=250, height=50)
-        btn_options = self.dpg.add_button(
-            label="Options", parent=self.container, width=250, height=50)
-        btn_exit = self.dpg.add_button(
-            label="Exit", parent=self.container, width=250, height=50)
-        self.add_component("container", self.container)
-        self.add_component("text", text_id)
-        self.add_component("create_button", btn_create_session)
-        self.add_component("load_button", btn_load_session)
-        self.add_component("join_button", btn_join_session)
-        self.add_component("options_button", btn_options)
-        self.add_component("exit_button", btn_exit)
+        self.dpg.add_text("Menu Buttons", parent=self.container)
 
-    def set_create_button_callback(self, callback_func):
-        button = self.get_component_by_name("create_button")
-        self.dpg.configure_item(button, callback=callback_func)
+        # Create the buttons and their callbacks
+        buttons = [
+            ("Create Session", self.on_create_clicked),
+            ("Load Session", self.on_load_clicked),
+            ("Join Session", self.on_join_clicked),
+            ("Options", self.on_options_clicked),
+            ("Exit", self.on_exit_clicked)
+        ]
+        for label, callback in buttons:
+            button = self.dpg.add_button(label=label, parent=self.container, width=250, height=50,callback=callback)
+            self.add_component(label, button)
 
-    def set_load_button_callback(self, callback_func):
-        button = self.get_component_by_name("load_button")
-        self.dpg.configure_item(button, callback=callback_func)
+    def on_create_clicked(self):
+        self.dynamic_viewport.clear_view()
+        self.dynamic_viewport.set_view(CreateSessionView(self.dpg, self.dynamic_viewport))
 
-    def set_join_button_callback(self, callback_func):
-        button = self.get_component_by_name("join_button")
-        self.dpg.configure_item(button, callback=callback_func)
+    def on_load_clicked(self):
+        self.dynamic_viewport.clear_view()
+        self.dynamic_viewport.set_view(LoadSessionView(self.dpg, self.dynamic_viewport))
 
-    def set_options_button_callback(self, callback_func):
-        button = self.get_component_by_name("options_button")
-        self.dpg.configure_item(button, callback=callback_func)
+    def on_join_clicked(self):
+        self.dynamic_viewport.clear_view()
+        self.dynamic_viewport.set_view(JoinSessionView(self.dpg, self.dynamic_viewport))
 
-    def set_exit_button_callback(self, callback_func):
-        button = self.get_component_by_name("exit_button")
-        self.dpg.configure_item(button, callback=callback_func)
+    def on_options_clicked(self):
+        self.dynamic_viewport.clear_view()
+        self.dynamic_viewport.set_view(OptionsView(self.dpg, self.dynamic_viewport))
 
+    def on_exit_clicked(self):
+        self.dynamic_viewport.clear_view()
+        quit(0)
 
 
 class TitleScreen(Scene):
@@ -143,37 +171,8 @@ class TitleScreen(Scene):
                                           no_title_bar=True, no_move=True)
         text_id = self.dpg.add_text("Welcome to the Game Master Assistant", parent=self.window,
                                     pos=(actual_width / 2, 10))
-        self.button_box = ButtonBox(self.dpg)
         self.dynamic_window = DynamicViewPort(self.dpg)
+        self.button_box = ButtonBox(self.dpg, self.dynamic_window)
         self.add_component("test_window", self.window)
-        self.add_component("text", text_id)
         self.add_component("button_box", self.button_box)
         self.add_component("dynamic_window", self.dynamic_window)
-        self.get_component_by_name("button_box").set_create_button_callback(self.on_create_clicked)
-        self.get_component_by_name("button_box").set_load_button_callback(self.on_load_clicked)
-        self.get_component_by_name("button_box").set_join_button_callback(self.on_join_clicked)
-        self.get_component_by_name("button_box").set_options_button_callback(self.on_options_clicked)
-        self.get_component_by_name("button_box").set_exit_button_callback(self.on_exit_clicked)
-
-    def on_create_clicked(self):
-        # Trialing something here.
-        if self.create_session_view is None:
-            self.create_session_view = CreateSessionView(self.dpg, self.dynamic_window)
-        else:
-            return
-
-    def on_load_clicked(self):
-        self.dynamic_window.clear_section_text()
-        self.dynamic_window.set_section_text("Load Session:")
-
-    def on_join_clicked(self):
-        self.dynamic_window.clear_section_text()
-        self.dynamic_window.set_section_text("Join Session:")
-
-    def on_options_clicked(self):
-        self.dynamic_window.clear_section_text()
-        self.dynamic_window.set_section_text("Options:")
-
-    def on_exit_clicked(self):
-        self.dynamic_window.clear_section_text()
-        quit(0)
