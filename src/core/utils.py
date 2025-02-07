@@ -6,14 +6,40 @@ This file is for utility functions that are frequently used.
 
 from datetime import datetime
 import random
+import sys
 import os
 from src.core.paths import root_dir, sessions_dir
 list_states = ["initial", "D4", "D6", "D8", "D10"]
 
+
+def get_screen_resolution():
+    if sys.platform == 'win32':
+        import ctypes
+        user32 = ctypes.windll.user32
+        return user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+    elif sys.platform == 'darwin': # macOS
+        import subprocess
+        output = subprocess.check_output(['osascript', '-e', 'tell application "System Events" to get position of every window of desktop']).decode('utf-8')
+        width = int(output.splitlines()[1].split(',')[3].strip().replace('}', ''))
+        height = int(output.splitlines()[2].split(',')[3].strip().replace('}', ''))
+        return width, height
+    else: # Linux
+        import subprocess
+        width = standard_width
+        height = standard_height
+        output = subprocess.check_output(['xrandr']).decode('utf-8').split('\n')
+        for line in output:
+            if 'connected' in line:
+                resolution = line.split()[0]
+                width, height = map(int, resolution.split('x'))
+                break
+        return width, height
+
 standard_width = 1920
 standard_height = 1080
-actual_width = 1920
-actual_height = 1080
+actual_width = get_screen_resolution()[0]
+actual_height = get_screen_resolution()[1]
+scale_factor = min((actual_width / standard_width), (actual_height / standard_height))
 
 
 class Message:
