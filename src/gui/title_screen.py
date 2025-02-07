@@ -150,7 +150,10 @@ class ButtonBox(Scene):
 
     def on_exit_clicked(self):
         self.dynamic_viewport.clear_view()
-        quit(0)
+        try:
+            self.dpg.stop_dearpygui()
+        except Exception as e:
+            print(f"Error during shutdown: {e}")
 
 
 class TitleScreen(Scene):
