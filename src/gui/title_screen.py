@@ -3,6 +3,9 @@
 """
 This class is responsible for creating the title screen.
 """
+"""
+TODO: refactor into separate files and organize them into their own directories.
+"""
 
 from src.gui.scene import Scene
 from src.core.utils import actual_width, actual_height, scale_factor
@@ -13,6 +16,8 @@ class CreateSessionView(Scene):
         super().__init__(dpg, name="create_session_view")
         self.dpg = dpg
         self.parent = parent
+        self.session_name_id = None
+        self.ruleset_selection_id = None
         self.create()
 
     def create(self):
@@ -21,20 +26,27 @@ class CreateSessionView(Scene):
             "Enter the session name:", pos=(10, 50),
             parent=self.parent.view_container, show=True
         )
-        session_name = self.dpg.add_input_text(
+        self.session_name_id = self.dpg.add_input_text(
             pos=(220, 50), multiline=False, width=200,
             height=30, parent=self.parent.view_container,
             show=True
         )
-        confirm_button = self.dpg.add_button(label="Confirm", pos=(450, 50), parent=self.parent.view_container)
+        confirm_button = self.dpg.add_button(
+            label="Confirm", pos=(450, 50), parent=self.parent.view_container, callback=self.confirm_button_callback)
 
         ruleset_text = self.dpg.add_text("Ruleset:", pos=(10, 100), parent=self.parent.view_container)
-        ruleset_selection = self.dpg.add_radio_button(
+        self.ruleset_selection_id = self.dpg.add_radio_button(
             items=["Default - (No Ruleset)", "D&D 5e",
                    "Savage Worlds Deluxe Edition",
                    "Savage Worlds Adventure Edition (SWADE)",
                    "Starfinder"],
-            parent=self.parent.view_container, pos=(10, 130), show=True)
+            parent=self.parent.view_container, pos=(10, 130), show=True, default_value="Default - (No Ruleset)")
+
+    def confirm_button_callback(self, sender, app_data):
+        session_name_value = self.dpg.get_value(self.session_name_id)
+        selected_ruleset = self.dpg.get_value(self.ruleset_selection_id)
+        print(f"Confirm button clicked, data collected:\n{session_name_value}\n{selected_ruleset}")
+        print("TODO: Create Session using the SessionManager.")
 
 
 class LoadSessionView(Scene):
