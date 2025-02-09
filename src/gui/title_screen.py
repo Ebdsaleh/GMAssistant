@@ -54,14 +54,24 @@ class LoadSessionView(Scene):
         super().__init__(dpg, name="load_session_view")
         self.dpg = dpg
         self.parent = parent
+        self.selected_session_id = None
         self.create()
 
     def create(self):
         self.dpg.add_text("Load Session:", parent=self.parent.view_container, pos=(10, 10))
         self.dpg.add_text("Available Sessions:", parent=self.parent.view_container, pos=(10, 50))
-        self.dpg.add_button(label="Confirm", pos=(450, 50), parent=self.parent.view_container)
-        self.dpg.add_listbox(
+        self.dpg.add_button(
+            label="Confirm", pos=(450, 50), parent=self.parent.view_container, callback=self.confirm_button_callback)
+        # TODO: populate the items from the SessionManager's sessions_list
+        # pseudo code example below.
+        # found_sessions = session_manager._instance.session_list
+        self.selected_session_id = self.dpg.add_listbox(
             items=["session 1", "session 2", "session 3"], parent=self.parent.view_container, pos=(10, 100))
+
+    def confirm_button_callback(self, sender, app_data):
+        selected_session = self.dpg.get_value(self.selected_session_id)
+        print(f"Confirm button clicked, data collected:\n{selected_session}")
+        print("TODO: find the session in the SessionManager and load the session.")
 
 class JoinSessionView(Scene):
     def __init__(self, dpg=scene_dpg, parent=None):
