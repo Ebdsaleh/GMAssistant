@@ -17,7 +17,7 @@ from src.core.utils import generate_new_random_seed, msg_instance, list_states
 from src.core.paths import root_dir, sessions_dir
 from src.core.tables import MeaningTables
 from src.core.fate import Fate
-from src.core.session_manager import SessionManager
+from src.core.session_manager import session_manager_instance
 from src.core.lexer import Lexer
 
 
@@ -25,7 +25,7 @@ class GM:
     def __init__(self):
         self.prefix = "[GM]: "
         self.message = msg_instance
-        self.sm = SessionManager()
+        self.sm = session_manager_instance
         self.fate = Fate()
         self.pool = DicePool()
         self.adventure_list = AdventureList()

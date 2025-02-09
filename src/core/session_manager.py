@@ -60,3 +60,4 @@ class SessionManager:
         return self._instance.active_session
 
 
+session_manager_instance = SessionManager()
